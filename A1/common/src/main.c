@@ -97,7 +97,7 @@ int main( void )
 
 
 
-    configASSERT( res1 == pdPASS && res2 == pdPASS );
+    configASSERT( res1 == pdPASS && res2 == pdPASS && res3 == pdPASS );
 
 
     // Iniciar scheduler

@@ -13,6 +13,6 @@
 
 #define CUENTAS_1MS             9251
 
-#define HACER_FALLAR            1
+#define HACER_FALLAR            0
 
 #endif
