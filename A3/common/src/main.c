@@ -179,7 +179,7 @@ void tarea_A_code( void* taskParmPtr )
 			  configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
 			  NULL,                        // Parametros de tarea
 			  my_prio - 3,                 /* le doy menos prioridad que la tarea actual (la A) */
-			  &task_handle_c               // Referencia a la tarea creada en el sistema
+			  &task_handle_d               // Referencia a la tarea creada en el sistema
 		  );
 
 	configASSERT( res == pdPASS );
