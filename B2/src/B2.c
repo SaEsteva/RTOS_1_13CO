@@ -1,5 +1,6 @@
 /*=============================================================================
- * Copyright (c) 2021, Martin N. Menendez <mmenendez@fi.uba.ar>
+ * Copyright (c) 2021, Franco Bucafusco <franco_bucafusco@yahoo.com.ar>
+ * 					   Martin N. Menendez <mmenendez@fi.uba.ar>
  * All rights reserved.
  * License: Free
  * Date: 2021/10/03

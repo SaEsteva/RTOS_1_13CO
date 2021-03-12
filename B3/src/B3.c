@@ -1,5 +1,6 @@
 /*=============================================================================
- * Copyright (c) 2021, Martin N. Menendez <mmenendez@fi.uba.ar>
+ * Copyright (c) 2021, Franco Bucafusco <franco_bucafusco@yahoo.com.ar>
+ * 					   Martin N. Menendez <mmenendez@fi.uba.ar>
  * All rights reserved.
  * License: Free
  * Date: 2021/10/03
@@ -102,11 +103,12 @@ void tarea_led( void* taskParmPtr )
     {
     		dif = get_diff(index);
 
-    		if (dif > LED_RATE)
-				dif = LED_RATE;
+
 
 			if( dif != KEYS_INVALID_TIME )
 			{
+				if ( dif > LED_RATE)
+					dif = LED_RATE;
 				gpioWrite( LEDB+index, ON );
 				gpioWrite( GPIO7+index , ON );
 				vTaskDelay( dif );

@@ -8,13 +8,14 @@
  *===========================================================================*/
 
 /*==================[ Inclusions ]============================================*/
+#include "keys.h"
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "sapi.h"
-#include "keys.h"
 
 /*=====[ Definitions of private data types ]===================================*/
-const t_key_config  keys_config[] = { TEC1 };
+const t_key_config  keys_config[] = { TEC1 , TEC2, TEC3, TEC4 };
 
 #define KEY_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
 /*=====[Definition macros of private constants]==============================*/
@@ -38,14 +39,19 @@ void task_tecla( void* taskParmPtr );
 TickType_t get_diff( uint32_t index )
 {
 	TickType_t tiempo;
+
+	taskENTER_CRITICAL();
 	tiempo = keys_data[index].time_diff;
+	taskEXIT_CRITICAL();
 
 	return tiempo;
 }
 
 void clear_diff( uint32_t index )
 {
+	taskENTER_CRITICAL();
 	keys_data[index].time_diff = KEYS_INVALID_TIME;
+	taskEXIT_CRITICAL();
 }
 
 void keys_Init( void )
@@ -147,7 +153,9 @@ static void buttonPressed( uint32_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
+	taskENTER_CRITICAL();
 	keys_data[index].time_down = current_tick_count;
+	taskEXIT_CRITICAL();
 }
 
 /* accion de el evento de tecla liberada */
@@ -155,13 +163,17 @@ static void buttonReleased( uint32_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
+	taskENTER_CRITICAL();
 	keys_data[index].time_up    = current_tick_count;
 	keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
+	taskEXIT_CRITICAL();
 }
 
 static void keys_ButtonError( uint32_t index )
 {
+	taskENTER_CRITICAL();
 	keys_data[index].state = BUTTON_UP;
+	taskEXIT_CRITICAL();
 }
 
 /*=====[Implementations of private functions]=================================*/
