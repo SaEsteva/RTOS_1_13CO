@@ -1,6 +1,6 @@
 # RTOS_1
 
-Material did醕tico para la asignatura Sistemas Operativos en Tiempo Real de la Carrera de Especializaci髇 en Sistemas Embebidos.
+Material did谩ctico para la asignatura Sistemas Operativos en Tiempo Real de la Carrera de Especializaci贸n en Sistemas Embebidos.
 
 ## Compatibilidad de los ejercicios
 
@@ -9,9 +9,23 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 ## Ejercicios
 
 ### Guia A
-| Ejercicio | Descripci髇 | Tipo |
+| Ejercicio | Descripci贸n | Tipo |
 | :-: | :-: | :-: |
 | A_1 | Control del stack  | Explicado en clase |
-| A_2 | Extensi髇 conceptual de A1 |  |
+| A_2 | Extensi贸n conceptual de A1 |  |
 | A_3 | Suspension y reanudacion de tareas y prioridades | Explicado en clase  |
 | A_4 | A3 sin Round Robin | OBLIGATORIO |
+
+### Guia B
+| Ejercicio | Descripci贸n | Tipo |
+| :-: | :-: | :-: |
+| B_1 | Demoras fijas  | Explicado en clase |
+| B_2 | Per铆odos fijos | Explicado en clase |
+| B_3 | Medir tiempo transcurrido | Explicado en clase |
+| B_4 | B_3 multitecla | Explicado en clase |
+| B_5 | One-shot | Explicado en clase |
+| B_6 | Tick rate modificado | Explicado en clase |
+| B_7 | Integrador | OBLIGATORIO |
+| B_8 | Extensi贸n de B.7 | Ejercitaci贸n extra |
+| B_9 | Transmisi贸n de UART simulada por soft | Ejercitaci贸n extra |
+| B_10 | Recepci贸n de UART simulada por soft | Ejercitaci贸n extra |
