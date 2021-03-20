@@ -33,39 +33,29 @@ static void buttonReleased( uint32_t index );
 t_key_data keys_data[KEY_COUNT];
 
 /*=====[prototype of private functions]=================================*/
-<<<<<<< HEAD
+
 void task_tecla( void* taskParmPtr );
-=======
-void task_tecla( void );
->>>>>>> develop
+
 
 /*=====[Implementations of public functions]=================================*/
 TickType_t get_diff( uint32_t index )
 {
 	TickType_t tiempo;
-<<<<<<< HEAD
-	tiempo = keys_data[index].time_diff;
-=======
 
 	taskENTER_CRITICAL();
 	tiempo = keys_data[index].time_diff;
 	taskEXIT_CRITICAL();
->>>>>>> develop
 
 	return tiempo;
 }
 
 void clear_diff( uint32_t index )
 {
-<<<<<<< HEAD
-	keys_data[index].time_diff = KEYS_INVALID_TIME;
-=======
 
 	taskENTER_CRITICAL();
 	keys_data[index].time_diff = KEYS_INVALID_TIME;
 	taskEXIT_CRITICAL();
 
->>>>>>> develop
 }
 
 void keys_Init( void )
@@ -75,18 +65,13 @@ void keys_Init( void )
 
 	for (i = 0 ; i < KEY_COUNT ; i++)
 	{
-<<<<<<< HEAD
-=======
 		taskENTER_CRITICAL();
->>>>>>> develop
 		keys_data[i].state          = BUTTON_UP;  // Set initial state
 		keys_data[i].time_down      = KEYS_INVALID_TIME;
 		keys_data[i].time_up        = KEYS_INVALID_TIME;
 		keys_data[i].time_diff      = KEYS_INVALID_TIME;
-<<<<<<< HEAD
-=======
 		taskEXIT_CRITICAL();
->>>>>>> develop
+
 	}
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
@@ -189,45 +174,25 @@ static void buttonReleased( uint32_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
-<<<<<<< HEAD
-	keys_data[index].time_up    = current_tick_count;
-	keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
-=======
-	taskENTER_CRITICAL();
+   taskENTER_CRITICAL();
 	keys_data[index].time_up    = current_tick_count;
 	keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
 	taskEXIT_CRITICAL();
->>>>>>> develop
+
 }
 
 static void keys_ButtonError( uint32_t index )
 {
-<<<<<<< HEAD
+
 	keys_data[index].state = BUTTON_UP;
 }
 
 /*=====[Implementations of private functions]=================================*/
 void task_tecla( void* taskParmPtr )
 {
-	uint32_t i;
-	while( TRUE )
-	{
-		for (i = 0 ; i < KEY_COUNT ; i++)
-			keys_Update( i );
-=======
-	taskENTER_CRITICAL();
-	keys_data[index].state = BUTTON_UP;
-	taskEXIT_CRITICAL();
-}
-
-/*=====[Implementations of private functions]=================================*/
-void task_tecla( void )
-{
-	
 	while( TRUE )
 	{
 		keys_Update( 0 );
->>>>>>> develop
 		vTaskDelay( DEBOUNCE_TIME_MS );
 	}
 }
