@@ -29,3 +29,13 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | B_8 | Extensión de B.7 | Ejercitación extra |
 | B_9 | Transmisión de UART simulada por soft | Ejercitación extra |
 | B_10 | Recepción de UART simulada por soft | Ejercitación extra |
+
+### Guia C
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| C_1 | Sincronización con sem binario  | Explicado en clase |
+| C_2 | C_1 multitecla| Explicado en clase |
+| C_3 | Sincronizar varias tareas | Explicado en clase |
+| C_4 | Espera de semaforo | OBLIGATORIO |
+| C_5 | Contador de eventos | Explicado en clase |
+| C_6 | C_5 modular | Explicado en clase |
