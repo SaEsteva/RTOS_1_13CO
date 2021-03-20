@@ -22,7 +22,7 @@
 #define LED_RATE pdMS_TO_TICKS(LED_RATE_MS)
 #define LOADING_RATE pdMS_TO_TICKS(LOADING_RATE_MS)
 
-#define MODE 3
+#define MODE 1
 
 /*==================[definiciones de datos internos]=========================*/
 

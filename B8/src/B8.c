@@ -19,7 +19,6 @@
 #define LED_RATE pdMS_TO_TICKS(RATE)
 /*==================[definiciones de datos internos]=========================*/
 gpioMap_t leds_t[] = {LEDB, LED1, LED2, LED3};
-gpioMap_t gpio_t[] = {GPIO7, GPIO5, GPIO3, GPIO1};
 /*==================[definiciones de datos externos]=========================*/
 DEBUG_PRINT_ENABLE;
 
@@ -27,7 +26,7 @@ extern t_key_config* keys_config;
 
 #define LED_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
 /*==================[declaraciones de funciones internas]====================*/
-void gpio_init(void);
+
 /*==================[declaraciones de funciones externas]====================*/
 TickType_t get_diff();
 void clear_diff();
@@ -43,8 +42,6 @@ int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
 	boardConfig();									// Inicializar y configurar la plataforma
-
-	gpio_init();
 
 	debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
 	printf( "Ejercicio B_8.\r\n" );
@@ -84,13 +81,7 @@ int main( void )
 }
 
 /*==================[definiciones de funciones internas]=====================*/
-void gpio_init(void)
-{
-    gpioInit( GPIO7, GPIO_OUTPUT );
-    gpioInit( GPIO5, GPIO_OUTPUT );
-    gpioInit( GPIO3, GPIO_OUTPUT );
-    gpioInit( GPIO1, GPIO_OUTPUT );
-}
+
 /*==================[definiciones de funciones externas]=====================*/
 
 // Implementacion de funcion de la tarea
@@ -107,22 +98,19 @@ void tarea_led( void* taskParmPtr )
     {
     		dif = get_diff(index);
 
-			if( dif != KEYS_INVALID_TIME && dif > 0 )
+			if( dif != KEYS_INVALID_TIME )
 			{
-				if ( dif > LED_RATE)
+				if (dif > LED_RATE)
 					dif = LED_RATE;
 				gpioWrite( leds_t[index], ON );
-				gpioWrite( gpio_t[index] , ON );
 				vTaskDelay( dif );
 				gpioWrite( leds_t[index], OFF );
-				gpioWrite( gpio_t[index] , OFF );
-
 				vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
 			}
 			else
 			{
 				vTaskDelay( LED_RATE );
-			}
+			}         
     }
 }
 
