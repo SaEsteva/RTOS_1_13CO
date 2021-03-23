@@ -18,9 +18,11 @@
 const t_key_config  keys_config[] = { TEC1 };
 
 #define KEY_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
+
 /*=====[Definition macros of private constants]==============================*/
-#define DEBOUNCE_TIME   40
-#define DEBOUNCE_TIME_MS pdMS_TO_TICKS(DEBOUNCE_TIME)
+#define DEBOUNCE_TIME           40
+#define DEBOUNCE_TIME_TICKS     pdMS_TO_TICKS(DEBOUNCE_TIME)
+
 /*=====[Prototypes (declarations) of private functions]======================*/
 
 static void keys_ButtonError( uint32_t index );
@@ -54,7 +56,7 @@ void keys_Init( void )
 	BaseType_t res;
 	uint32_t i;
 
-	for (i = 0 ; i < KEY_COUNT ; i++)
+	for ( i = 0 ; i < KEY_COUNT ; i++ )
 	{
 		keys_data[i].state          = BUTTON_UP;  // Set initial state
 		keys_data[i].time_down      = KEYS_INVALID_TIME;
@@ -63,13 +65,13 @@ void keys_Init( void )
 	}
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-	  task_tecla,					// Funcion de la tarea a ejecutar
-	  ( const char * )"task_tecla",	// Nombre de la tarea como String amigable para el usuario
-	  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
-	  0,							// Parametros de tarea
-	  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-	  0							// Puntero a la tarea creada en el sistema
-	);
+			  task_tecla,					// Funcion de la tarea a ejecutar
+			  ( const char * )"task_tecla",	// Nombre de la tarea como String amigable para el usuario
+			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
+			  0,							// Parametros de tarea
+			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
+			  0							// Puntero a la tarea creada en el sistema
+		  );
 
 	// Gestión de errores
 	configASSERT( res == pdPASS );
@@ -171,8 +173,11 @@ void task_tecla( void* taskParmPtr )
 	uint32_t i;
 	while( TRUE )
 	{
-		for (i = 0 ; i < KEY_COUNT ; i++)
+		for ( i = 0 ; i < KEY_COUNT ; i++ )
+		{
 			keys_Update( i );
-		vTaskDelay( DEBOUNCE_TIME_MS );
+		}
+
+		vTaskDelay( DEBOUNCE_TIME_TICKS );
 	}
 }

@@ -62,50 +62,50 @@ int main( void )
 #if MODE == 1
     // Crear tarea en freeRTOS
     BaseType_t res =
-    xTaskCreate(
-    	heart_beat,                     	// Funcion de la tarea a ejecutar
-        ( const char * )"heart_beat",   	// Nombre de la tarea como String amigable para el usuario
-        configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
-        0,                          		// Parametros de tarea
-        tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
-        0                          			// Puntero a la tarea creada en el sistema
-    );
+        xTaskCreate(
+            heart_beat,                     	// Funcion de la tarea a ejecutar
+            ( const char * )"heart_beat",   	// Nombre de la tarea como String amigable para el usuario
+            configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
+            0,                          		// Parametros de tarea
+            tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
+            0                          			// Puntero a la tarea creada en el sistema
+        );
 #endif
 
-	#if MODE == 2
+#if MODE == 2
     // Crear tarea en freeRTOS
     BaseType_t res =
-    xTaskCreate(
-    	loading_1,                     	// Funcion de la tarea a ejecutar
-        ( const char * )"loading_1",   	// Nombre de la tarea como String amigable para el usuario
-        configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
-        0,                          		// Parametros de tarea
-        tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
-        0                          			// Puntero a la tarea creada en el sistema
-    );
-	#endif
+        xTaskCreate(
+            loading_1,                     	// Funcion de la tarea a ejecutar
+            ( const char * )"loading_1",   	// Nombre de la tarea como String amigable para el usuario
+            configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
+            0,                          		// Parametros de tarea
+            tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
+            0                          			// Puntero a la tarea creada en el sistema
+        );
+#endif
 
 
-	#if MODE == 3
+#if MODE == 3
     // Crear tarea en freeRTOS
     BaseType_t res =
-    xTaskCreate(
-    	loading_2,                     	// Funcion de la tarea a ejecutar
-        ( const char * )"loading_2",   	// Nombre de la tarea como String amigable para el usuario
-        configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
-        0,                          		// Parametros de tarea
-        tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
-        0                          			// Puntero a la tarea creada en el sistema
-    );
-	#endif
+        xTaskCreate(
+            loading_2,                     	// Funcion de la tarea a ejecutar
+            ( const char * )"loading_2",   	// Nombre de la tarea como String amigable para el usuario
+            configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
+            0,                          		// Parametros de tarea
+            tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
+            0                          			// Puntero a la tarea creada en el sistema
+        );
+#endif
     // Gestion de errores
-	//if(res == pdFAIL)
-	//{
-	//	gpioWrite( LEDR, ON );
-	//	printf( "Error al crear las tareas.\r\n" );
-	//	while(TRUE);						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
-	//}
-	configASSERT( res == pdPASS ); // gestion de errores
+    //if(res == pdFAIL)
+    //{
+    //	gpioWrite( LEDR, ON );
+    //	printf( "Error al crear las tareas.\r\n" );
+    //	while(TRUE);						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
+    //}
+    configASSERT( res == pdPASS ); // gestion de errores
 
     // Iniciar scheduler
     vTaskStartScheduler(); // Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
@@ -113,7 +113,7 @@ int main( void )
     // ---------- REPETIR POR SIEMPRE --------------------------
     //while( TRUE )
     //{
-        // Si cae en este while 1 significa que no pudo iniciar el scheduler
+    // Si cae en este while 1 significa que no pudo iniciar el scheduler
     //}
     configASSERT( 0 );
 
@@ -133,14 +133,14 @@ int main( void )
 void heart_beat( void* taskParmPtr )
 {
     // ---------- CONFIGURACIONES ------------------------------
-    gpioWrite( GPIO0 , ON );
+    gpioWrite( GPIO0, ON );
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-        gpioWrite( LEDB , ON );
+        gpioWrite( LEDB, ON );
         vTaskDelay( LED_RATE_MS / portTICK_RATE_MS );
 
-        gpioWrite( LEDB ,OFF );
+        gpioWrite( LEDB,OFF );
         gpioToggle( GPIO0 );
 
         vTaskDelay( LED_RATE ); //NO USAR!!
@@ -154,29 +154,29 @@ void loading_1( void* taskParmPtr )
     gpioMap_t led = LEDB;
     gpioMap_t gpio = GPIO7;
 
-    gpioWrite( GPIO7 , ON );
-    gpioWrite( GPIO5 , ON );
-    gpioWrite( GPIO3 , ON );
-    gpioWrite( GPIO1 , ON );
+    gpioWrite( GPIO7, ON );
+    gpioWrite( GPIO5, ON );
+    gpioWrite( GPIO3, ON );
+    gpioWrite( GPIO1, ON );
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-        gpioWrite( led , ON );
-        gpioWrite( gpio , ON );
+        gpioWrite( led, ON );
+        gpioWrite( gpio, ON );
         vTaskDelay( LOADING_RATE );
 
-        gpioWrite( led ,OFF );
-        gpioWrite( gpio , OFF );
+        gpioWrite( led,OFF );
+        gpioWrite( gpio, OFF );
 
-        if (led == LED3)
+        if ( led == LED3 )
         {
-        	led = LEDB;
-        	gpio = GPIO7;
+            led = LEDB;
+            gpio = GPIO7;
         }
         else
         {
-        	led = led + 1;
-        	gpio ++;
+            led = led + 1;
+            gpio ++;
         }
 
         vTaskDelay( LOADING_RATE ); //NO USAR!!
@@ -190,25 +190,25 @@ void loading_2( void* taskParmPtr )
     gpioMap_t led = LEDB;
     gpioMap_t gpio = GPIO7;
 
-	gpioWrite( GPIO7 , ON );
-	gpioWrite( GPIO5 , ON );
-	gpioWrite( GPIO3 , ON );
-	gpioWrite( GPIO1 , ON );
+    gpioWrite( GPIO7, ON );
+    gpioWrite( GPIO5, ON );
+    gpioWrite( GPIO3, ON );
+    gpioWrite( GPIO1, ON );
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-    	gpioToggle(led);
-    	gpioToggle(gpio);
+        gpioToggle( led );
+        gpioToggle( gpio );
 
-        if (led == LED3)
+        if ( led == LED3 )
         {
-        	led = LEDB;
-        	gpio = GPIO7;
+            led = LEDB;
+            gpio = GPIO7;
         }
         else
         {
-        	led = led + 1;
-        	gpio ++;
+            led = led + 1;
+            gpio ++;
         }
 
         vTaskDelay( LOADING_RATE );

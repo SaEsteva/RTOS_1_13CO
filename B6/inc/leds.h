@@ -16,9 +16,9 @@
 
 typedef struct
 {
-	gpioMap_t led;
-	gpioMap_t gpio;
-	TickType_t rate;
+    gpioMap_t led;
+    gpioMap_t gpio;
+    TickType_t rate;
 } t_led;
 
 
