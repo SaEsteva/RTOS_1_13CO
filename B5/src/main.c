@@ -41,18 +41,18 @@ void tarea_tecla( void* taskParmPtr );
 int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	boardConfig();									// Inicializar y configurar la plataforma
+    boardConfig();									// Inicializar y configurar la plataforma
 
-	gpioInit( GPIO7, GPIO_OUTPUT );
-	gpioInit( GPIO5, GPIO_OUTPUT );
-	gpioInit( GPIO3, GPIO_OUTPUT );
-	gpioInit( GPIO1, GPIO_OUTPUT );
+    gpioInit( GPIO7, GPIO_OUTPUT );
+    gpioInit( GPIO5, GPIO_OUTPUT );
+    gpioInit( GPIO3, GPIO_OUTPUT );
+    gpioInit( GPIO1, GPIO_OUTPUT );
 
-	debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
-	printf( "Ejercicio B_5.\r\n" );
+    debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
+    printf( "Ejercicio B_5.\r\n" );
 
-	BaseType_t res;
-	uint32_t i;
+    BaseType_t res;
+    uint32_t i;
 
     /* inicializo driver de teclas */
     keys_Init();
@@ -76,27 +76,27 @@ int main( void )
 // Implementacion de funcion de la tarea
 void tarea_led( void* taskParmPtr )
 {
-	uint32_t index = (uint32_t) taskParmPtr;
+    uint32_t index = ( uint32_t ) taskParmPtr;
 
     // ---------- CONFIGURACIONES ------------------------------
-	TickType_t dif;
+    TickType_t dif;
     // ---------- REPETIR POR SIEMPRE --------------------------
 
-	dif = get_diff(index);
+    dif = get_diff( index );
 
-	gpioWrite( LEDB+index, ON );
-	gpioWrite( GPIO7+index , ON );
-	vTaskDelay( dif );
-	gpioWrite( LEDB+index, OFF );
-	gpioWrite( GPIO7+index , OFF );
+    gpioWrite( LEDB+index, ON );
+    gpioWrite( GPIO7+index, ON );
+    vTaskDelay( dif );
+    gpioWrite( LEDB+index, OFF );
+    gpioWrite( GPIO7+index, OFF );
 
-	vTaskDelete(NULL);
+    vTaskDelete( NULL );
 }
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
 void vApplicationMallocFailedHook()
 {
-	printf( "Malloc Failed Hook!\n" );
-	configASSERT( 0 );
+    printf( "Malloc Failed Hook!\n" );
+    configASSERT( 0 );
 }
 /*==================[fin del archivo]========================================*/

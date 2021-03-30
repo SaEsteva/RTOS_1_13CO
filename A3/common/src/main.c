@@ -65,38 +65,38 @@ void tarea_D_code( void*  );
 // FUNCION PRINCIPAL, PUNTO DE ENTRADA AL PROGRAMA LUEGO DE ENCENDIDO O RESET.
 int main( void )
 {
-	BaseType_t res;
+    BaseType_t res;
 
-	// ---------- CONFIGURACIONES ------------------------------
-	PRINTF_CONFIGURE;
-	PRINTF( EXAMPLE_WELCOME_TEXT );
+    // ---------- CONFIGURACIONES ------------------------------
+    PRINTF_CONFIGURE;
+    PRINTF( EXAMPLE_WELCOME_TEXT );
 
-	/* solo creo la tarea A */
-	res = xTaskCreate(
-			  tarea_A_code,               // Funcion de la tarea a ejecutar
-			  ( const char * )"tarea_a",  // Nombre de la tarea como String amigable para el usuario
-			  configMINIMAL_STACK_SIZE*2, /* tamaño del stack de cada tarea (words) */
-			  NULL,                       // Parametros de tarea
-			  tskIDLE_PRIORITY+4,         // Prioridad de la tarea
-			  &task_handle_a            // Referencia a la tarea creada en el sistema
-		  );
+    /* solo creo la tarea A */
+    res = xTaskCreate(
+              tarea_A_code,               // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_a",  // Nombre de la tarea como String amigable para el usuario
+              configMINIMAL_STACK_SIZE*2, /* tamaño del stack de cada tarea (words) */
+              NULL,                       // Parametros de tarea
+              tskIDLE_PRIORITY+4,         // Prioridad de la tarea
+              &task_handle_a            // Referencia a la tarea creada en el sistema
+          );
 
-	configASSERT( res == pdPASS );
+    configASSERT( res == pdPASS );
 
 
-	// Iniciar scheduler
-	vTaskStartScheduler();
+    // Iniciar scheduler
+    vTaskStartScheduler();
 
-	// ---------- REPETIR POR SIEMPRE --------------------------
-	while( 1 )
-	{
-		// Si cae en este while 1 significa que no pudo iniciar el scheduler
-	}
+    // ---------- REPETIR POR SIEMPRE --------------------------
+    while( 1 )
+    {
+        // Si cae en este while 1 significa que no pudo iniciar el scheduler
+    }
 
-	// NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa se ejecuta
-	// directamenteno sobre un microcontroladore y no es llamado por ningun
-	// Sistema Operativo, como en el caso de un programa para PC.
-	return 0;
+    // NO DEBE LLEGAR NUNCA AQUI, debido a que a este programa se ejecuta
+    // directamenteno sobre un microcontroladore y no es llamado por ningun
+    // Sistema Operativo, como en el caso de un programa para PC.
+    return 0;
 }
 
 /*==================[definiciones de funciones internas]=====================*/
@@ -111,125 +111,125 @@ int main( void )
  */
 void delay_con_for( uint32_t ms )
 {
-	volatile uint32_t i;
-	volatile uint32_t j;
+    volatile uint32_t i;
+    volatile uint32_t j;
 
-	for( i=0 ; i<ms ; i++ )
-	{
-		/* delay de aprox 1 ms */
-		for( j=0 ; j<CUENTAS_1MS ; j++ )
-		{
-		}
-	}
+    for( i=0 ; i<ms ; i++ )
+    {
+        /* delay de aprox 1 ms */
+        for( j=0 ; j<CUENTAS_1MS ; j++ )
+        {
+        }
+    }
 }
 
 void blink_n_500( uint32_t n, uint32_t led )
 {
-	/* genero 2 blinks*/
-	int blink_count  = n;
-	int cycles       = blink_count*2;
+    /* genero 2 blinks*/
+    int blink_count  = n;
+    int cycles       = blink_count*2;
 
-	for( ; cycles>0 ; cycles-- )
-	{
-		gpioToggle( led );
-		delay_con_for( 500 );
-	}
+    for( ; cycles>0 ; cycles-- )
+    {
+        gpioToggle( led );
+        delay_con_for( 500 );
+    }
 }
 
 /*==================[definiciones de funciones externas]=====================*/
 void tarea_A_code( void* taskParmPtr )
 {
-	BaseType_t res;
+    BaseType_t res;
 
-	PRINTF( "Tarea A\r\n" );
+    PRINTF( "Tarea A\r\n" );
 
-	UBaseType_t my_prio = uxTaskPriorityGet( 0 );   /* se podria haber usado uxTaskPriorityGet( task_handles[0] ) */
+    UBaseType_t my_prio = uxTaskPriorityGet( 0 );   /* se podria haber usado uxTaskPriorityGet( task_handles[0] ) */
 
     /* creo la tarea B con mnor prioridad que la que esta corriendo actualmente
        No hay CC */
-	res = xTaskCreate(
-			  tarea_B_code,                // Funcion de la tarea a ejecutar
-			  ( const char * )"tarea_b",   // Nombre de fantasia
-			  configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
-			  NULL,                        // Parametros de tarea
-			  my_prio - 1,                 /* le doy menos prioridad que la tarea actual (la A) */
-			  &task_handle_b               // Referencia a la tarea creada en el sistema
-		  );
+    res = xTaskCreate(
+              tarea_B_code,                // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_b",   // Nombre de fantasia
+              configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
+              NULL,                        // Parametros de tarea
+              my_prio - 1,                 /* le doy menos prioridad que la tarea actual (la A) */
+              &task_handle_b               // Referencia a la tarea creada en el sistema
+          );
 
-	configASSERT( res == pdPASS );
+    configASSERT( res == pdPASS );
 
     /* creo la tarea C con mnor prioridad que la que esta corriendo actualmente
        No hay CC */
-	res = xTaskCreate(
-			  tarea_C_code,                // Funcion de la tarea a ejecutar
-			  ( const char * )"tarea_c",   // Nombre de fantasia
-			  configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
-			  NULL,                        // Parametros de tarea
-			  my_prio - 2,                 /* le doy menos prioridad que la tarea actual (la A) */
-			  &task_handle_c               // Referencia a la tarea creada en el sistema
-		  );
+    res = xTaskCreate(
+              tarea_C_code,                // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_c",   // Nombre de fantasia
+              configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
+              NULL,                        // Parametros de tarea
+              my_prio - 2,                 /* le doy menos prioridad que la tarea actual (la A) */
+              &task_handle_c               // Referencia a la tarea creada en el sistema
+          );
 
-	configASSERT( res == pdPASS );
+    configASSERT( res == pdPASS );
 
     /* creo la tarea D con mnor prioridad que la que esta corriendo actualmente
        No hay CC */
-	res = xTaskCreate(
-			  tarea_D_code,                // Funcion de la tarea a ejecutar
-			  ( const char * )"tarea_d",   // Nombre de fantasia
-			  configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
-			  NULL,                        // Parametros de tarea
-			  my_prio - 3,                 /* le doy menos prioridad que la tarea actual (la A) */
-			  &task_handle_d               // Referencia a la tarea creada en el sistema
-		  );
+    res = xTaskCreate(
+              tarea_D_code,                // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_d",   // Nombre de fantasia
+              configMINIMAL_STACK_SIZE*2,  /* tamaño del stack de cada tarea (words) */
+              NULL,                        // Parametros de tarea
+              my_prio - 3,                 /* le doy menos prioridad que la tarea actual (la A) */
+              &task_handle_d               // Referencia a la tarea creada en el sistema
+          );
 
-	configASSERT( res == pdPASS );
+    configASSERT( res == pdPASS );
 
-	/* suspendo la tarea actual */
-	vTaskSuspend( 0 );                              /* se podria haber usado vTaskSuspend( task_handles[0] ) */
+    /* suspendo la tarea actual */
+    vTaskSuspend( 0 );                              /* se podria haber usado vTaskSuspend( task_handles[0] ) */
 
-	blink_n_500( 2 , LEDB );
+    blink_n_500( 2, LEDB );
 
-	/* suspendo la tarea actual */
-	vTaskSuspend( task_handle_a );                /* se podria haber usado vTaskSuspend( 0 ) */
+    /* suspendo la tarea actual */
+    vTaskSuspend( task_handle_a );                /* se podria haber usado vTaskSuspend( 0 ) */
 }
 
 void tarea_B_code( void* taskParmPtr )
 {
-	PRINTF( "Tarea B\r\n" );
+    PRINTF( "Tarea B\r\n" );
 
-	blink_n_500( 3, LED1 );
+    blink_n_500( 3, LED1 );
 
-	/* retomo tarea A, como tiene mayor prioridad, habra un cambio de contexto.*/
-	vTaskResume( task_handle_a );
+    /* retomo tarea A, como tiene mayor prioridad, habra un cambio de contexto.*/
+    vTaskResume( task_handle_a );
 
-	/* suspendo la tarea actual, le va a dar el CPU a las tareas de menor prioridad (porque la tarea A esta suspendida) */
-	vTaskSuspend( task_handle_b );   /* se podria haber usado vTaskSuspend( 0 ) */
+    /* suspendo la tarea actual, le va a dar el CPU a las tareas de menor prioridad (porque la tarea A esta suspendida) */
+    vTaskSuspend( task_handle_b );   /* se podria haber usado vTaskSuspend( 0 ) */
 }
 
 void tarea_C_code( void* taskParmPtr )
 {
-	PRINTF( "Tarea C\r\n" );
+    PRINTF( "Tarea C\r\n" );
 
-	blink_n_500( 3, LED2 );
+    blink_n_500( 3, LED2 );
 
-	/* suspendo la tarea actual, le va a dar el CPU a las tareas de menor prioridad (porque la tarea A esta suspendida) */
-	vTaskSuspend( task_handle_c);       /* se podria haber usado vTaskSuspend( 0 ) */
+    /* suspendo la tarea actual, le va a dar el CPU a las tareas de menor prioridad (porque la tarea A esta suspendida) */
+    vTaskSuspend( task_handle_c );      /* se podria haber usado vTaskSuspend( 0 ) */
 }
 
 void tarea_D_code( void* taskParmPtr )
 {
-	PRINTF( "Tarea D\r\n" );
+    PRINTF( "Tarea D\r\n" );
 
-	/* termino todas las tareas de mas prioridad */
-	vTaskDelete( task_handle_a );
-	vTaskDelete( task_handle_b );
-	vTaskDelete( task_handle_c );
+    /* termino todas las tareas de mas prioridad */
+    vTaskDelete( task_handle_a );
+    vTaskDelete( task_handle_b );
+    vTaskDelete( task_handle_c );
 
-	while( 1 )
-	{
-		gpioToggle( LED3 );
-		delay_con_for( 500 );
-	}
+    while( 1 )
+    {
+        gpioToggle( LED3 );
+        delay_con_for( 500 );
+    }
 }
 
 /*==================[fin del archivo]========================================*/
