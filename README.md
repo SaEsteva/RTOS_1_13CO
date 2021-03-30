@@ -2,9 +2,13 @@
 
 Material didáctico para la asignatura Sistemas Operativos en Tiempo Real de la Carrera de Especialización en Sistemas Embebidos.
 
+Para ayudarnos a mejorar pueden completar la [**ENCUESTA ANONIMA CLASE A CLASE**](https://docs.google.com/forms/d/e/1FAIpQLSfft_6uKg4g7DuKFp6WpEY4KCkab74CwTH_rxveGGpW1zIy1Q/viewform). ¡Gracias!
+
 ## Compatibilidad de los ejercicios
 
 Los ejecicios son compatibles con el framework firmware v3 (https://github.com/epernia/firmware_v3)
+
+Los ejercicios de la Guía A, ademas, son compatibles con el framework (en desarrollo) (https://github.com/fbucafusco/embedded_framework) para correr aplicaciones de FreeRTOS simuladas en la PC.
 
 ## Ejercicios
 
@@ -39,3 +43,14 @@ Los ejecicios son compatibles con el framework firmware v3 (https://github.com/e
 | C_4 | Espera de semaforo | OBLIGATORIO |
 | C_5 | Contador de eventos | Explicado en clase |
 | C_6 | C_5 modular | Explicado en clase |
+
+### Guia D
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| D_1 | printf conflictivo | Explicado en clase |
+| D_2 | El B7 tiene errores !  | Explicado en clase |
+| D_3 | Más acceso concurrente | Ejercitación extra |
+| D_4 | Acceso a un módulo desde varias tareas | OBLIGATORIO |
+| D_5 | Inversión de prioridades | Explicado en clase |
+| D_6 | Inversión de prioridades + UART | Ejercitación extra |
+

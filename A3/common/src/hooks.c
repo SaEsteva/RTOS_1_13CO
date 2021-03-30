@@ -48,11 +48,11 @@ extern TaskHandle_t task_handles[2];
  */
 void vApplicationStackOverflowHook( TaskHandle_t pxTask, char *pcTaskName )
 {
-	PRINTF( "\r\nApplication Stack Overflow!! on Task: %s\r\n", ( char* )pcTaskName );
+    PRINTF( "\r\nApplication Stack Overflow!! on Task: %s\r\n", ( char* )pcTaskName );
 
-	taskENTER_CRITICAL();
-	configASSERT( 0 );   /* hang the execution for debugging purposes */
-	taskEXIT_CRITICAL();
+    taskENTER_CRITICAL();
+    configASSERT( 0 );   /* hang the execution for debugging purposes */
+    taskEXIT_CRITICAL();
 }
 
 void vApplicationIdleHook()

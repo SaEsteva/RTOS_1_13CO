@@ -8,32 +8,32 @@
  *===========================================================================*/
 
 /*==================[inclusiones]============================================*/
+
 #include "FreeRTOS.h"
 #include "task.h"
 #include "FreeRTOSConfig.h"
 
 #include "sapi.h"
-#include "keys.h"
+
 /*==================[definiciones y macros]==================================*/
+
 #define RATE 1000
 #define LED_RATE pdMS_TO_TICKS(RATE)
+#define STEP 100
+#define MAX_T  (RATE - STEP)
+
 /*==================[definiciones de datos internos]=========================*/
 
 /*==================[definiciones de datos externos]=========================*/
+
 DEBUG_PRINT_ENABLE;
 
-extern t_key_config* keys_config;
-
-#define LED_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
 /*==================[declaraciones de funciones internas]====================*/
 
 /*==================[declaraciones de funciones externas]====================*/
-TickType_t get_diff();
-void clear_diff();
 
 // Prototipo de funcion de la tarea
-void tarea_led( void* taskParmPtr );
-void tarea_tecla( void* taskParmPtr );
+void heart_beat( void* taskParmPtr );
 
 /*==================[funcion principal]======================================*/
 
@@ -41,40 +41,32 @@ void tarea_tecla( void* taskParmPtr );
 int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	boardConfig();									// Inicializar y configurar la plataforma
 
-	gpioInit( GPIO7, GPIO_OUTPUT );
-	gpioInit( GPIO5, GPIO_OUTPUT );
-	gpioInit( GPIO3, GPIO_OUTPUT );
-	gpioInit( GPIO1, GPIO_OUTPUT );
+    boardConfig();									// Inicializar y configurar la plataforma
 
-	debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
-	printf( "Ejercicio B_3.\r\n" );
+    gpioInit( GPIO0, GPIO_OUTPUT );
 
-	BaseType_t res;
-	uint32_t i;
+    debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
+    printf( "Ejercicio B_2.\r\n" );
+
+    //gpioWrite( LED3, ON );							// Led para dar señal de vida
 
     // Crear tarea en freeRTOS
-	for (i = 0 ; i < LED_COUNT ; i++)
-	{
-		res = xTaskCreate(
-        tarea_led,                     // Funcion de la tarea a ejecutar
-        ( const char * )"tarea_led",   // Nombre de la tarea como String amigable para el usuario
-        configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-        i,                          // Parametros de tarea
-        tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-        0                           // Puntero a la tarea creada en el sistema
-    );
+    BaseType_t res =
+        xTaskCreate(
+            heart_beat,                     	// Funcion de la tarea a ejecutar
+            ( const char * )"heart_beat",   	// Nombre de la tarea como String amigable para el usuario
+            configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
+            0,                          		// Parametros de tarea
+            tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
+            0                          			// Puntero a la tarea creada en el sistema
+        );
 
-		// Gestion de errores
-		configASSERT( res == pdPASS );
-	}
-
-    /* inicializo driver de teclas */
-    keys_Init();
+    // Gestion de errores
+    configASSERT( res == pdPASS );
 
     // Iniciar scheduler
-    vTaskStartScheduler();					// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
+    vTaskStartScheduler(); // Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
 
     // ---------- REPETIR POR SIEMPRE --------------------------
     configASSERT( 0 );
@@ -90,43 +82,34 @@ int main( void )
 /*==================[definiciones de funciones externas]=====================*/
 
 // Implementacion de funcion de la tarea
-void tarea_led( void* taskParmPtr )
+void heart_beat( void* taskParmPtr )
 {
-	uint32_t index = (uint32_t) taskParmPtr;
-
     // ---------- CONFIGURACIONES ------------------------------
-	//TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
-	//TickType_t xLastWakeTime = xTaskGetTickCount();
-	TickType_t dif;
+    TickType_t xPeriodicity =  LED_RATE;		// Tarea periodica cada 1000 ms
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    uint16_t duty = 0;
+
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-    		dif = get_diff(index);
+        duty += STEP;
 
+        gpioWrite( LEDB, ON );
+        gpioWrite( GPIO0, ON );
+        vTaskDelay( duty / portTICK_RATE_MS );
+        //vTaskDelay ( pdMS_TO_TICKS(duty) );
+        gpioWrite( LEDB, OFF );
+        gpioWrite( GPIO0, OFF );
 
+        if ( duty == MAX_T )
+        {
+            duty = 0;
+        }
 
-			if( dif != KEYS_INVALID_TIME )
-			{
-				if ( dif > LED_RATE)
-					dif = LED_RATE;
-				gpioWrite( LEDB+index, ON );
-				gpioWrite( GPIO7+index , ON );
-				vTaskDelay( dif );
-				gpioWrite( LEDB+index, OFF );
-				gpioWrite( GPIO7+index , OFF );
-				clear_diff ( index );
-			}
-			else
-			{
-				vTaskDelay( LED_RATE );
-			}
+        // Envia la tarea al estado bloqueado durante xPeriodicity (delay periodico)
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
     }
 }
 
-/* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
-void vApplicationMallocFailedHook()
-{
-	printf( "Malloc Failed Hook!\n" );
-	configASSERT( 0 );
-}
 /*==================[fin del archivo]========================================*/

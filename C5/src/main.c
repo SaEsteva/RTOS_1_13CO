@@ -20,7 +20,7 @@
 #define RATE 1000
 #define LED_RATE pdMS_TO_TICKS(RATE)
 
-#define WELCOME_MSG  "Ejercicio C_2.\r\n"
+#define WELCOME_MSG  "Ejercicio C_5.\r\n"
 #define USED_UART UART_USB
 #define UART_RATE 115200
 #define MALLOC_ERROR "Malloc Failed Hook!\n"
@@ -36,7 +36,7 @@ extern t_key_config keys_config[];
 
 #define LED_COUNT   sizeof(leds_t)/sizeof(leds_t[0])
 /*==================[declaraciones de funciones internas]====================*/
-void gpio_init(void);
+void gpio_init( void );
 /*==================[declaraciones de funciones externas]====================*/
 TickType_t get_diff();
 void clear_diff();
@@ -50,30 +50,30 @@ void tarea_tecla( void* taskParmPtr );
 int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	boardConfig();									// Inicializar y configurar la plataforma
+    boardConfig();									// Inicializar y configurar la plataforma
 
-	gpio_init();
+    gpio_init();
 
-	debugPrintConfigUart( USED_UART, UART_RATE );		// UART for debug messages
-	printf( WELCOME_MSG );
+    debugPrintConfigUart( USED_UART, UART_RATE );		// UART for debug messages
+    printf( WELCOME_MSG );
 
-	BaseType_t res;
-	uint32_t i;
+    BaseType_t res;
+    uint32_t i;
 
     // Crear tarea en freeRTOS
-	for (i = 0 ; i < LED_COUNT ; i++)
-	{
-		res = xTaskCreate(
-        tarea_led,                     // Funcion de la tarea a ejecutar
-        ( const char * )"tarea_led",   // Nombre de la tarea como String amigable para el usuario
-        configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-        i,                          // Parametros de tarea
-        tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-        0                           // Puntero a la tarea creada en el sistema
-    );
-		// Gestion de errores
-		configASSERT( res == pdPASS );
-	}
+    for ( i = 0 ; i < LED_COUNT ; i++ )
+    {
+        res = xTaskCreate(
+                  tarea_led,                     // Funcion de la tarea a ejecutar
+                  ( const char * )"tarea_led",   // Nombre de la tarea como String amigable para el usuario
+                  configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+                  i,                          // Parametros de tarea
+                  tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+                  0                           // Puntero a la tarea creada en el sistema
+              );
+        // Gestion de errores
+        configASSERT( res == pdPASS );
+    }
 
     // Inicializo driver de teclas
     keys_Init();
@@ -91,48 +91,51 @@ int main( void )
 }
 
 /*==================[definiciones de funciones internas]=====================*/
-void gpio_init(void)
+void gpio_init( void )
 {
-	uint32_t i;
+    uint32_t i;
 
-	for( i = 0 ; i < LED_COUNT; i++)
-	{
-		gpioInit (gpio_t[i], GPIO_OUTPUT);
-	}
+    for( i = 0 ; i < LED_COUNT; i++ )
+    {
+        gpioInit ( gpio_t[i], GPIO_OUTPUT );
+    }
 }
 /*==================[definiciones de funciones externas]=====================*/
 
 // Implementacion de funcion de la tarea
 void tarea_led( void* taskParmPtr )
 {
-	uint32_t index = (uint32_t) taskParmPtr;
+    uint32_t index = ( uint32_t ) taskParmPtr;
 
     // ---------- CONFIGURACIONES ------------------------------
-	TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
-	TickType_t xLastWakeTime = xTaskGetTickCount();
-	TickType_t dif;
+    TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    TickType_t dif;
+    uint8_t contador = 0;
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-    	xSemaphoreTake( keys_config[index].sem_btn , portMAX_DELAY );			// Esperamos tecla
+        contador = ( uint8_t )uxSemaphoreGetCount( keys_config[index].sem_btn );
+        printf( "Quedan %d semaforos\r\n",contador );
 
-		dif = get_diff(index);
-		clear_diff(index);
+        xSemaphoreTake( keys_config[index].sem_btn, portMAX_DELAY );			// Esperamos tecla
 
-		gpioWrite( leds_t[index], ON );
-		gpioWrite( gpio_t[index] , ON );
-		vTaskDelay( dif );
-		gpioWrite( leds_t[index], OFF );
-		gpioWrite( gpio_t[index] , OFF );
+        xLastWakeTime = xTaskGetTickCount();
 
-		//vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
+        gpioWrite( leds_t[index], ON );
+        gpioWrite( gpio_t[index], ON );
+        vTaskDelay( xPeriodicity / 2 );
+        gpioWrite( leds_t[index], OFF );
+        gpioWrite( gpio_t[index], OFF );
+
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
     }
 }
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
 void vApplicationMallocFailedHook()
 {
-	printf( MALLOC_ERROR );
-	configASSERT( 0 );
+    printf( MALLOC_ERROR );
+    configASSERT( 0 );
 }
 /*==================[fin del archivo]========================================*/

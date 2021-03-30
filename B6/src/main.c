@@ -36,8 +36,8 @@ t_led leds[N_LEDS];
 DEBUG_PRINT_ENABLE;
 
 /*==================[declaraciones de funciones internas]====================*/
-void leds_init(void);
-void gpio_init(void);
+void leds_init( void );
+void gpio_init( void );
 /*==================[declaraciones de funciones externas]====================*/
 
 // Prototipo de funcion de la tarea
@@ -58,22 +58,22 @@ int main( void )
 
     leds_init();
 
-	uint32_t i;
+    uint32_t i;
     // Crear tarea en freeRTOS
-	for ( i = 0 ; i < N_LEDS ; i++)
-	{
-		BaseType_t res =
-		xTaskCreate(
-			led_task,                     	// Funcion de la tarea a ejecutar
-			( const char * )"led_task",   	// Nombre de la tarea como String amigable para el usuario
-			configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
-			&leds[i],                          		// Parametros de tarea
-			tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
-			0                          			// Puntero a la tarea creada en el sistema
-		);
+    for ( i = 0 ; i < N_LEDS ; i++ )
+    {
+        BaseType_t res =
+            xTaskCreate(
+                led_task,                     	// Funcion de la tarea a ejecutar
+                ( const char * )"led_task",   	// Nombre de la tarea como String amigable para el usuario
+                configMINIMAL_STACK_SIZE*2, 		// Cantidad de stack de la tarea
+                &leds[i],                          		// Parametros de tarea
+                tskIDLE_PRIORITY+1,         		// Prioridad de la tarea -> Queremos que este un nivel encima de IDLE
+                0                          			// Puntero a la tarea creada en el sistema
+            );
 
-		configASSERT( res == pdPASS ); // gestion de errores
-	}
+        configASSERT( res == pdPASS ); // gestion de errores
+    }
 
     // Iniciar scheduler
     vTaskStartScheduler(); // Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
@@ -90,7 +90,7 @@ int main( void )
 
 /*==================[definiciones de funciones internas]=====================*/
 
-void gpio_init(void)
+void gpio_init( void )
 {
     gpioInit( GPIO7, GPIO_OUTPUT );
     gpioInit( GPIO5, GPIO_OUTPUT );
@@ -98,17 +98,17 @@ void gpio_init(void)
     gpioInit( GPIO1, GPIO_OUTPUT );
 }
 
-void leds_init(void)
+void leds_init( void )
 {
 
-	uint32_t i;
+    uint32_t i;
 
-	for ( i = 0 ; i < N_LEDS ; i++ )
-	{
-		leds[i].led = leds_t[i];
-		leds[i].rate = rate_t[i];
-		leds[i].gpio = gpio_t[i];
-	}
+    for ( i = 0 ; i < N_LEDS ; i++ )
+    {
+        leds[i].led = leds_t[i];
+        leds[i].rate = rate_t[i];
+        leds[i].gpio = gpio_t[i];
+    }
 }
 
 /*==================[definiciones de funciones externas]=====================*/
@@ -117,7 +117,7 @@ void leds_init(void)
 
 void led_task( void* taskParmPtr )
 {
-	t_led* led = (t_led*) taskParmPtr;
+    t_led* led = ( t_led* ) taskParmPtr;
 
     // ---------- CONFIGURACIONES ------------------------------
     TickType_t xPeriodicity =  2*led->rate;
@@ -126,13 +126,13 @@ void led_task( void* taskParmPtr )
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-        gpioWrite( led->led , ON );
-        gpioWrite( led->gpio , ON );
+        gpioWrite( led->led, ON );
+        gpioWrite( led->gpio, ON );
         vTaskDelay( led->rate );
 
-        gpioWrite( led->led ,OFF );
-        gpioWrite( led->gpio , OFF );
-        vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
+        gpioWrite( led->led,OFF );
+        gpioWrite( led->gpio, OFF );
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
     }
 }
 

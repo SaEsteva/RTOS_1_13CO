@@ -15,9 +15,6 @@
 #include "sapi.h"
 
 /*=====[ Definitions of private data types ]===================================*/
-const t_key_config  keys_config[] = { TEC1 };
-
-#define KEY_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
 
 /*=====[Definition macros of private constants]==============================*/
 #define DEBOUNCE_TIME           40
@@ -25,22 +22,24 @@ const t_key_config  keys_config[] = { TEC1 };
 
 /*=====[Prototypes (declarations) of private functions]======================*/
 
-static void keys_ButtonError( uint32_t index );
-static void buttonPressed( uint32_t index );
-static void buttonReleased( uint32_t index );
+static void keys_reset( uint32_t index );
+static void keys_event_handler_button_pressed( uint32_t index );
+static void keys_event_handler_button_release( uint32_t index );
 
 /*=====[Definitions of private global variables]=============================*/
+const t_key_config  keys_config[] = { TEC1 } ;
 
-/*=====[Definitions of public global variables]==============================*/
+#define KEY_COUNT   sizeof(keys_config)/sizeof(keys_config[0])
+
 t_key_data keys_data[KEY_COUNT];
 
+/*=====[Definitions of public global variables]==============================*/
+
 /*=====[prototype of private functions]=================================*/
-
-void task_tecla( void* taskParmPtr );
-
+void keys_service_task( void* taskParmPtr );
 
 /*=====[Implementations of public functions]=================================*/
-TickType_t get_diff( uint32_t index )
+TickType_t keys_get_diff( uint32_t index )
 {
 	TickType_t tiempo;
 
@@ -51,45 +50,44 @@ TickType_t get_diff( uint32_t index )
 	return tiempo;
 }
 
-void clear_diff( uint32_t index )
+void keys_clear_diff( uint32_t index )
 {
-
 	taskENTER_CRITICAL();
 	keys_data[index].time_diff = KEYS_INVALID_TIME;
 	taskEXIT_CRITICAL();
-
 }
 
-void keys_Init( void )
+void keys_init( void )
 {
 	BaseType_t res;
-	uint32_t i;
 
-	for ( i = 0 ; i < KEY_COUNT ; i++ )
+	for ( uint32_t i = 0 ; i < KEY_COUNT ; i++ )
 	{
-		taskENTER_CRITICAL();
 		keys_data[i].state          = BUTTON_UP;  // Set initial state
 		keys_data[i].time_down      = KEYS_INVALID_TIME;
 		keys_data[i].time_up        = KEYS_INVALID_TIME;
 		keys_data[i].time_diff      = KEYS_INVALID_TIME;
-		taskEXIT_CRITICAL();
-
 	}
+
 	// Crear tareas en freeRTOS
 	res = xTaskCreate (
-			  task_tecla,					// Funcion de la tarea a ejecutar
-			  ( const char * )"task_tecla",	// Nombre de la tarea como String amigable para el usuario
-			  configMINIMAL_STACK_SIZE*2,	// Cantidad de stack de la tarea
-			  0,							// Parametros de tarea
-			  tskIDLE_PRIORITY+1,			// Prioridad de la tarea
-			  0							// Puntero a la tarea creada en el sistema
+			  keys_service_task,					// Funcion de la tarea a ejecutar
+			  ( const char * )"keys_service_task",	// Nombre de la tarea como String amigable para el usuario
+			  configMINIMAL_STACK_SIZE*2,	        // Cantidad de stack de la tarea
+			  0,							        // Parametros de tarea
+			  tskIDLE_PRIORITY+1,			        // Prioridad de la tarea
+			  0							            // Puntero a la tarea creada en el sistema
 		  );
 
 	// Gestión de errores
 	configASSERT( res == pdPASS );
 }
 
-// keys_ Update State Function
+/**
+   @brief Keys SM
+
+   @param index
+ */
 void keys_Update( uint32_t index )
 {
 	switch( keys_data[index].state )
@@ -111,7 +109,7 @@ void keys_Update( uint32_t index )
 				keys_data[index].state = STATE_BUTTON_DOWN;
 
 				/* ACCION DEL EVENTO !*/
-				buttonPressed( index );
+				keys_event_handler_button_pressed( index );
 			}
 			else
 			{
@@ -139,7 +137,7 @@ void keys_Update( uint32_t index )
 				keys_data[index].state = STATE_BUTTON_UP;
 
 				/* ACCION DEL EVENTO ! */
-				buttonReleased( index );
+				keys_event_handler_button_release( index );
 			}
 			else
 			{
@@ -150,60 +148,70 @@ void keys_Update( uint32_t index )
 			break;
 
 		default:
-			keys_ButtonError( index );
+			keys_reset( index );
 			break;
 	}
 }
 
 /*=====[Implementations of private functions]================================*/
 
-/* accion de el evento de tecla pulsada */
-static void buttonPressed( uint32_t index )
+/**
+   @brief Event handler for key pressed
+
+   @param index
+ */
+static void keys_event_handler_button_pressed( uint32_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
-<<<<<<< HEAD
-	keys_data[index].time_down = current_tick_count;
-=======
 	taskENTER_CRITICAL();
 	keys_data[index].time_down = current_tick_count;
 	taskEXIT_CRITICAL();
->>>>>>> develop
 }
 
-/* accion de el evento de tecla liberada */
-static void buttonReleased( uint32_t index )
+/**
+   @brief Event handler for key release
+
+   @param index
+ */
+static void keys_event_handler_button_release( uint32_t index )
 {
 	TickType_t current_tick_count = xTaskGetTickCount();
 
-   taskENTER_CRITICAL();
+	taskENTER_CRITICAL();
 	keys_data[index].time_up    = current_tick_count;
 	keys_data[index].time_diff  = keys_data[index].time_up - keys_data[index].time_down;
 	taskEXIT_CRITICAL();
-
 }
 
-static void keys_ButtonError( uint32_t index )
-{
+/**
+   @brief Restarts the button SM
 
+   @param index
+ */
+static void keys_reset( uint32_t index )
+{
+	taskENTER_CRITICAL();
 	keys_data[index].state = BUTTON_UP;
+	taskEXIT_CRITICAL();
 }
 
 /*=====[Implementations of private functions]=================================*/
-void task_tecla( void* taskParmPtr )
+
+/**
+   @brief Keys' sevice  task implementation.
+
+   @param taskParmPtr
+ */
+void keys_service_task( void* taskParmPtr )
 {
 	while( TRUE )
 	{
-<<<<<<< HEAD
-		keys_Update( 0 );
-		vTaskDelay( DEBOUNCE_TIME_MS );
-=======
-		for ( i = 0 ; i < KEY_COUNT ; i++ )
+		for ( uint32_t i = 0 ; i < KEY_COUNT ; i++ )
 		{
 			keys_Update( i );
 		}
 
 		vTaskDelay( DEBOUNCE_TIME_TICKS );
->>>>>>> b1cb2cdbebc6363462bf403b52a31ccb9eff54de
 	}
 }
