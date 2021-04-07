@@ -54,3 +54,12 @@ Los ejercicios de la Guía A, ademas, son compatibles con el framework (en desar
 | D_5 | Inversión de prioridades | Explicado en clase |
 | D_6 | Inversión de prioridades + UART | Ejercitación extra |
 
+### Guia E
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| E_1 | Pasaje de dato por copia | Explicado en clase |
+| E_2 | Lectura no bloqueante de cola| Explicado en clase |
+| E_3 | Exclusión mutua de recurso compartido| Explicado en clase |
+| E_4 | Comunicación bidireccional | Explicado en clase |
+| E_5 | Pasaje de estructuras | Explicado en clase |
+| E_5 | Pasaje por referencia | OBLIGATORIO |
