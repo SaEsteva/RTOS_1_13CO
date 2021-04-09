@@ -113,9 +113,12 @@ void tarea_led( void* taskParmPtr )
 			{
 				dif = LED_RATE_TICKS;
 			}
+
 			gpioWrite( LEDB+index, ON );
 			gpioWrite( GPIO7+index, ON );
+
 			vTaskDelay( dif );
+
 			gpioWrite( LEDB+index, OFF );
 			gpioWrite( GPIO7+index, OFF );
 
