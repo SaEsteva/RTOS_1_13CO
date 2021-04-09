@@ -40,8 +40,8 @@ SemaphoreHandle_t mutex;
 
 typedef struct
 {
-	gpioMap_t tecla;				//config
-	TickType_t tiempo_medido;	//variables
+    gpioMap_t tecla;				//config
+    TickType_t tiempo_medido;	//variables
 } tPrint;
 /*==================[definiciones de datos externos]=========================*/
 DEBUG_PRINT_ENABLE;
@@ -50,7 +50,7 @@ extern t_key_config* keys_config;
 
 #define LED_COUNT   sizeof(leds_t)/sizeof(leds_t[0])
 /*==================[declaraciones de funciones internas]====================*/
-void gpio_init(void);
+void gpio_init( void );
 /*==================[declaraciones de funciones externas]====================*/
 TickType_t get_diff();
 void clear_diff();
@@ -65,41 +65,41 @@ void tarea_print( void* taskParmPtr );
 int main( void )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	boardConfig();									// Inicializar y configurar la plataforma
+    boardConfig();									// Inicializar y configurar la plataforma
 
-	gpio_init();
+    gpio_init();
 
-	debugPrintConfigUart( USED_UART , UART_RATE );		// UART for debug messages
-	printf( WELCOME_MSG );
+    debugPrintConfigUart( USED_UART, UART_RATE );		// UART for debug messages
+    printf( WELCOME_MSG );
 
-	BaseType_t res;
-	uint32_t i;
+    BaseType_t res;
+    uint32_t i;
 
     // Crear tarea en freeRTOS
-	res = xTaskCreate(
-		tarea_led,                     // Funcion de la tarea a ejecutar
-		( const char * )"tarea_led_a",   // Nombre de la tarea como String amigable para el usuario
-		configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-		0,                          // Parametros de tarea
-		tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-		0                           // Puntero a la tarea creada en el sistema
-	);
+    res = xTaskCreate(
+              tarea_led,                     // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_led_a",   // Nombre de la tarea como String amigable para el usuario
+              configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+              0,                          // Parametros de tarea
+              tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+              0                           // Puntero a la tarea creada en el sistema
+          );
 
-	// Gestion de errores
-	configASSERT( res == pdPASS );
+    // Gestion de errores
+    configASSERT( res == pdPASS );
 
-	// Creo tarea unica de impresion
-	res = xTaskCreate(
-		tarea_print,                     // Funcion de la tarea a ejecutar
-		( const char * )"tarea_print",   // Nombre de la tarea como String amigable para el usuario
-		configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
-		0,                          // Parametros de tarea
-		tskIDLE_PRIORITY+1,         // Prioridad de la tarea
-		0                           // Puntero a la tarea creada en el sistema
-	);
+    // Creo tarea unica de impresion
+    res = xTaskCreate(
+              tarea_print,                     // Funcion de la tarea a ejecutar
+              ( const char * )"tarea_print",   // Nombre de la tarea como String amigable para el usuario
+              configMINIMAL_STACK_SIZE*2, // Cantidad de stack de la tarea
+              0,                          // Parametros de tarea
+              tskIDLE_PRIORITY+1,         // Prioridad de la tarea
+              0                           // Puntero a la tarea creada en el sistema
+          );
 
-	// Gestion de errores
-	configASSERT( res == pdPASS );
+    // Gestion de errores
+    configASSERT( res == pdPASS );
 
     /* inicializo driver de teclas */
     keys_Init();
@@ -108,24 +108,24 @@ int main( void )
     mutex = xSemaphoreCreateMutex( );
 
     // Gestion de errores de mutex
-	if( mutex == NULL)
-	{
-		gpioWrite( LED_ERROR, ON );
-		printf( MSG_ERROR_MTX );
-		while(TRUE);						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
-	}
+    if( mutex == NULL )
+    {
+        gpioWrite( LED_ERROR, ON );
+        printf( MSG_ERROR_MTX );
+        while( TRUE );						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
+    }
 
     // Crear cola
-	queue_tec_pulsada = xQueueCreate( 1 , sizeof(TickType_t) );
-	queue_print = xQueueCreate( N_QUEUE , sizeof(tPrint) );
+    queue_tec_pulsada = xQueueCreate( 1, sizeof( TickType_t ) );
+    queue_print = xQueueCreate( N_QUEUE, sizeof( tPrint ) );
 
-	// Gestion de errores de colas
-	if( queue_tec_pulsada == NULL || queue_print == NULL)
-	{
-		gpioWrite( LED_ERROR, ON );
-		printf( MSG_ERROR_QUE );
-		while(TRUE);						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
-	}
+    // Gestion de errores de colas
+    if( queue_tec_pulsada == NULL || queue_print == NULL )
+    {
+        gpioWrite( LED_ERROR, ON );
+        printf( MSG_ERROR_QUE );
+        while( TRUE );						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
+    }
 
 
     // Iniciar scheduler
@@ -141,7 +141,7 @@ int main( void )
 }
 
 /*==================[definiciones de funciones internas]=====================*/
-void gpio_init(void)
+void gpio_init( void )
 {
     gpioInit( GPIO7, GPIO_OUTPUT );
     gpioInit( GPIO5, GPIO_OUTPUT );
@@ -155,30 +155,32 @@ void gpio_init(void)
 void tarea_led( void* taskParmPtr )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
-	TickType_t xLastWakeTime = xTaskGetTickCount();
-	TickType_t dif = 0;
-	tPrint datos;
+    TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+    TickType_t dif = 0;
+    tPrint datos;
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-		xQueueReceive( queue_tec_pulsada , &dif,  portMAX_DELAY );			// Esperamos tecla
+        xQueueReceive( queue_tec_pulsada, &dif,  portMAX_DELAY );			// Esperamos tecla
 
-		if (dif > xPeriodicity)
-			dif = xPeriodicity;
+        if ( dif > xPeriodicity )
+        {
+            dif = xPeriodicity;
+        }
 
-		gpioWrite( LEDB , ON );
-		gpioWrite( GPIO7 , ON );
-		vTaskDelay( dif );
+        gpioWrite( LEDB, ON );
+        gpioWrite( GPIO7, ON );
+        vTaskDelay( dif );
 
-		datos.tecla = TEC1;
-		datos.tiempo_medido = dif;
-		xQueueSend( queue_print , &datos ,  portMAX_DELAY );
+        datos.tecla = TEC1;
+        datos.tiempo_medido = dif;
+        xQueueSend( queue_print, &datos,  portMAX_DELAY );
 
-		gpioWrite( LEDB , OFF );
-		gpioWrite( GPIO7 , OFF );
-		vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
-	}
+        gpioWrite( LEDB, OFF );
+        gpioWrite( GPIO7, OFF );
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+    }
 }
 
 
@@ -186,28 +188,28 @@ void tarea_led( void* taskParmPtr )
 void tarea_print( void* taskParmPtr )
 {
     // ---------- CONFIGURACIONES ------------------------------
-	TickType_t xPeriodicity =  PRINT_RATE;
-	TickType_t xLastWakeTime = xTaskGetTickCount();
+    TickType_t xPeriodicity =  PRINT_RATE;
+    TickType_t xLastWakeTime = xTaskGetTickCount();
     // ---------- REPETIR POR SIEMPRE --------------------------
 
-	tPrint datos;
+    tPrint datos;
 
-	while( TRUE )
-	{
-		xQueueReceive( queue_print , &datos,  portMAX_DELAY );			// Esperamos tecla
+    while( TRUE )
+    {
+        xQueueReceive( queue_print, &datos,  portMAX_DELAY );			// Esperamos tecla
 
-		gpioWrite( GPIO0 , ON );
-		printf("Se presiono TEC%d por %d ms\r\n",datos.tecla-TEC1+1,datos.tiempo_medido*portTICK_RATE_MS);
-		gpioWrite( GPIO0 , OFF );
+        gpioWrite( GPIO0, ON );
+        printf( "Se presiono TEC%d por %d ms\r\n",datos.tecla-TEC1+1,datos.tiempo_medido*portTICK_RATE_MS );
+        gpioWrite( GPIO0, OFF );
 
-		vTaskDelayUntil( &xLastWakeTime , xPeriodicity );
-	}
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+    }
 }
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
 void vApplicationMallocFailedHook()
 {
-	printf( "Malloc Failed Hook!\n" );
-	configASSERT( 0 );
+    printf( "Malloc Failed Hook!\n" );
+    configASSERT( 0 );
 }
 /*==================[fin del archivo]========================================*/

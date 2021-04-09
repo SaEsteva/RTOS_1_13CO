@@ -60,12 +60,12 @@
 /*==================[definiciones de datos internos]=========================*/
 typedef struct
 {
-	char* text;
+    char* text;
     uint32_t led;
     uint32_t periods;
 } t_params;
 
-t_params params[] = { {"tarea b" , LED1,3},{"tarea c" ,LED2,5} };
+t_params params[] = { {"tarea b", LED1,3},{"tarea c",LED2,5} };
 
 CRITICAL_DECLARE;
 
@@ -101,10 +101,14 @@ int main( void )
 
     printf( "\nEjercicio D5\n" );
 
-	if(EVIDENCIAR_PROBLEMA)
-		printf( "Ejecucion usando semaforos\n" );
-	else
-		printf( "Ejecucion usando mutex\n" );
+    if( EVIDENCIAR_PROBLEMA )
+    {
+        printf( "Ejecucion usando semaforos\n" );
+    }
+    else
+    {
+        printf( "Ejecucion usando mutex\n" );
+    }
 
     // Crear tarea en freeRTOS
     res = xTaskCreate(
@@ -149,7 +153,7 @@ void delay_con_while( uint32_t ms )
     TickType_t target = base  + ms ;   //habria que contemplar el wrap around
     while(  xTaskGetTickCount() < target   )
     {
-		//taskYIELD();
+        //taskYIELD();
     }
 }
 
@@ -241,15 +245,15 @@ void tarea_BC_code( void* taskParmPtr )
     t_params * param = ( t_params* ) taskParmPtr;
 
     /* bloqueo la tarea, para que la tarea A tome el CPU */
-	vTaskDelay( 100 / portTICK_RATE_MS );
+    vTaskDelay( 100 / portTICK_RATE_MS );
 
 
-	TickType_t tini = xTaskGetTickCount();
+    TickType_t tini = xTaskGetTickCount();
 
-	blink_n_500( param->periods, param->led );
+    blink_n_500( param->periods, param->led );
 
 
-	printf( "Soy %s y tarde en ejecutarme %u ms \n", param->text, xTaskGetTickCount()-tini );
+    printf( "Soy %s y tarde en ejecutarme %u ms \n", param->text, xTaskGetTickCount()-tini );
 
     /* me auto destruyo */
     vTaskDelete( 0 );
@@ -261,7 +265,7 @@ void tarea_AD_common( void* taskParmPtr )
 
     TickType_t tini = xTaskGetTickCount();
 
-	printf( "Hola ! Soy %s y quiero usar un recurso\n", texto);
+    printf( "Hola ! Soy %s y quiero usar un recurso\n", texto );
 
     CRITICAL_START;
 

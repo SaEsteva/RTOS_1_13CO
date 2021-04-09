@@ -35,13 +35,13 @@ DEBUG_PRINT_ENABLE;
 /*==================[declaraciones de funciones internas]====================*/
 const t_task_param params[4]=
 {
-    { "tarea 1" , 33},
-    { "tarea 2" , 55},
-    { "tarea 3" , 77},
-    { "tarea 4" , 99},
+    { "tarea 1", 33},
+    { "tarea 2", 55},
+    { "tarea 3", 77},
+    { "tarea 4", 99},
 };
 
- SemaphoreHandle_t mutex;
+SemaphoreHandle_t mutex;
 
 /*==================[declaraciones de funciones externas]====================*/
 // Prototipo de funcion de la tarea
@@ -59,7 +59,7 @@ int main( void )
     boardConfig();
 
     // UART for debug messages
-    debugPrintConfigUart( UART_USB , 9600 );
+    debugPrintConfigUart( UART_USB, 9600 );
 
     printf( "Ejercicio printf.\n" );
 
@@ -73,7 +73,7 @@ int main( void )
               0                             // Puntero a la tarea creada en el sistema
           );
 
-   res = xTaskCreate(
+    res = xTaskCreate(
               task,                  // Funcion de la tarea a ejecutar
               ( const char * )"t2",   	// Nombre de la tarea como String amigable para el usuario
               configMINIMAL_STACK_SIZE*2, 	// Cantidad de stack de la tarea
@@ -82,7 +82,7 @@ int main( void )
               0                             // Puntero a la tarea creada en el sistema
           );
 
-   res = xTaskCreate(
+    res = xTaskCreate(
               task,                  // Funcion de la tarea a ejecutar
               ( const char * )"t3",   	// Nombre de la tarea como String amigable para el usuario
               configMINIMAL_STACK_SIZE*2, 	// Cantidad de stack de la tarea
@@ -91,7 +91,7 @@ int main( void )
               0                             // Puntero a la tarea creada en el sistema
           );
 
-   res = xTaskCreate(
+    res = xTaskCreate(
               task,                  // Funcion de la tarea a ejecutar
               ( const char * )"t4",   	// Nombre de la tarea como String amigable para el usuario
               configMINIMAL_STACK_SIZE*2, 	// Cantidad de stack de la tarea
@@ -121,15 +121,15 @@ int main( void )
 // Implementacion de funcion de la tarea
 void task( void* taskParmPtr )
 {
-    t_task_param* param = (t_task_param*) taskParmPtr;
+    t_task_param* param = ( t_task_param* ) taskParmPtr;
 
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
         /* abro seccion critica */
-        xSemaphoreTake( mutex , portMAX_DELAY );
+        xSemaphoreTake( mutex, portMAX_DELAY );
 
-        printf( "Hola soy la tarea %s\n" , param->nombre );
+        printf( "Hola soy la tarea %s\n", param->nombre );
 
         /* cierro seccio ncritica */
         xSemaphoreGive( mutex );
