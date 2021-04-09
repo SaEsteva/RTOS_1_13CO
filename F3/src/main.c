@@ -123,18 +123,14 @@ void task_led( void* taskParmPtr )
 
     while( 1 )
     {
-        if( xQueueReceive( led_data->queue, &evnt, 0 ) == pdPASS  )
-        {
-            dif = keys_get_diff( evnt.tecla );
-        }
+        xQueueReceive( led_data->queue, &evnt, portMAX_DELAY )
+
+        dif = keys_get_diff( evnt.tecla );
+
 
         gpioWrite( led_data->led, ON );
-        vTaskDelayUntil( &xLastWakeTime, dif );
+        vTaskDelay( dif );
         gpioWrite( led_data->led, OFF );
-
-
-        // Envia la tarea al estado bloqueado durante xPeriodicity (delay periodico)
-        vTaskDelayUntil( &xLastWakeTime, 2*dif );
     }
 }
 
