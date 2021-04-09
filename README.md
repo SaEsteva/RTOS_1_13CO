@@ -62,4 +62,12 @@ Los ejercicios de la Guía A, ademas, son compatibles con el framework (en desar
 | E_3 | Exclusión mutua de recurso compartido| Explicado en clase |
 | E_4 | Comunicación bidireccional | Explicado en clase |
 | E_5 | Pasaje de estructuras | Explicado en clase |
-| E_5 | Pasaje por referencia | OBLIGATORIO |
+| E_6 | Pasaje de estructuras  2 | OBLIGATORIO |
+
+### Guia F
+| Ejercicio | Descripción | Tipo |
+| :-: | :-: | :-: |
+| F_1 | Uso de tecla con interrupciones + semáforo | Explicado en clase |
+| F_2 | Uso de teclas con interrupciones + semáforo | OBLIGATORIO |
+| F_3 | Uso de teclas con interrupciones + cola | Explicado en clase |
+| F_4 | UART: recepción y transmisión usando interrupción utilizando semáforo | Ejercicio extra |
