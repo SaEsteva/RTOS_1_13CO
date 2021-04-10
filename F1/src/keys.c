@@ -234,6 +234,8 @@ void keys_Update_Isr( uint32_t index )
                 keys_data[index].state = STATE_BUTTON_UP;
             }
 
+            //desenmascarar Chip_PININT_EnableIntLow
+
             /* LEAVE */
             break;
 
@@ -284,10 +286,11 @@ void keys_Update_Isr( uint32_t index )
  */
 static void keys_event_handler_button_pressed( uint32_t index )
 {
+    TickType_t current_tick_count = xTaskGetTickCount();
 
-
-
-
+    taskENTER_CRITICAL();
+    keys_data[index].time_down = current_tick_count;
+    taskEXIT_CRITICAL();
 }
 
 /**
@@ -361,6 +364,11 @@ void keys_isr_config( void )
     Chip_PININT_EnableIntLow( LPC_GPIO_PIN_INT, PININTCH( j ) );                        // INTj //Selecciona activo por flanco descendente
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH( j ) );                       // INTj //Selecciona activo por flanco ascendente
     */
+
+    /*Seteo la interrupción para el flanco descendente
+                        channel, GPIOx,                        [y]    <- no es la config del pin, sino el nombre interno de la señal
+                           |       |                           |
+                           |       |                           |    */
 
     // TEC1 FALL
     Chip_SCU_GPIOIntPinSel( 0, 0, 4 ); 	//(Canal 0 a 7, Puerto GPIO, Pin GPIO)
