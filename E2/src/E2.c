@@ -11,15 +11,24 @@
 #include "FreeRTOS.h"
 #include "task.h"
 #include "sapi.h"
+#include "queue.h"
 
 #include "FreeRTOSConfig.h"
 #include "keys.h"
 /*==================[definiciones y macros]==================================*/
-#define RATE                    1000
-#define LED_RATE_TICKS          pdMS_TO_TICKS(RATE)
+#define RATE 1000
+#define LED_RATE pdMS_TO_TICKS(RATE)
 
+#define WELCOME_MSG  "Ejercicio E_1.\r\n"
+#define USED_UART UART_USB
+#define UART_RATE 115200
+#define MALLOC_ERROR "Malloc Failed Hook!\n"
+#define MSG_ERROR_QUE "Error al crear la cola.\r\n"
+#define LED_ERROR LEDR
 /*==================[definiciones de datos internos]=========================*/
-
+const gpioMap_t leds_t[] = {LEDB};
+const gpioMap_t gpio_t[] = {GPIO7};
+QueueHandle_t queue_tec_pulsada;
 /*==================[definiciones de datos externos]=========================*/
 DEBUG_PRINT_ENABLE;
 
@@ -46,8 +55,8 @@ int main( void )
 
     gpio_init();
 
-    debugPrintConfigUart( UART_USB, 115200 );		// UART for debug messages
-    printf( "Ejercicio B_7.\r\n" );
+    debugPrintConfigUart( USED_UART, UART_RATE );		// UART for debug messages
+    printf( WELCOME_MSG );
 
     BaseType_t res;
     uint32_t i;
@@ -70,6 +79,17 @@ int main( void )
 
     /* inicializo driver de teclas */
     keys_Init();
+
+    // Crear cola
+    queue_tec_pulsada = xQueueCreate( 1, sizeof( TickType_t ) );
+
+    // Gestion de errores de colas
+    if( queue_tec_pulsada == NULL )
+    {
+        gpioWrite( LED_ERROR, ON );
+        printf( MSG_ERROR_QUE );
+        while( TRUE );						// VER ESTE LINK: https://pbs.twimg.com/media/BafQje7CcAAN5en.jpg
+    }
 
     // Iniciar scheduler
     vTaskStartScheduler();					// Enciende tick | Crea idle y pone en ready | Evalua las tareas creadas | Prioridad mas alta pasa a running
@@ -99,35 +119,27 @@ void tarea_led( void* taskParmPtr )
     uint32_t index = ( uint32_t ) taskParmPtr;
 
     // ---------- CONFIGURACIONES ------------------------------
-    TickType_t xPeriodicity = LED_RATE_TICKS; // Tarea periodica cada 1000 ms
+    TickType_t xPeriodicity = LED_RATE; // Tarea periodica cada 1000 ms
     TickType_t xLastWakeTime = xTaskGetTickCount();
-    TickType_t dif;
+    TickType_t dif = 0;
     // ---------- REPETIR POR SIEMPRE --------------------------
     while( TRUE )
     {
-        dif = get_diff( index );
+        xQueueReceive( queue_tec_pulsada, &dif, 0 );
 
-        if( dif != KEYS_INVALID_TIME && dif > 0 )
+
+        if ( dif > xPeriodicity )
         {
-            if ( dif > LED_RATE_TICKS )
-            {
-                dif = LED_RATE_TICKS;
-            }
-
-            gpioWrite( LEDB+index, ON );
-            gpioWrite( GPIO7+index, ON );
-
-            vTaskDelay( dif );
-
-            gpioWrite( LEDB+index, OFF );
-            gpioWrite( GPIO7+index, OFF );
-
-            vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+            dif = xPeriodicity;
         }
-        else
-        {
-            vTaskDelay( LED_RATE_TICKS );
-        }
+
+        gpioWrite( leds_t[index], ON );
+        gpioWrite( gpio_t[index], ON );
+        vTaskDelay( dif );
+        gpioWrite( leds_t[index], OFF );
+        gpioWrite( gpio_t[index], OFF );
+
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
     }
 }
 

@@ -8,6 +8,7 @@
  *===========================================================================*/
 
 
+
 /*=====[Inclusions of function dependencies]=================================*/
 #include "FreeRTOS.h"
 #include "FreeRTOSConfig.h"
@@ -17,14 +18,12 @@
 #include "keys.h"
 
 /*=====[Definition & macros of public constants]==============================*/
-#define RATE                    1000
-#define LED_RATE_TICKS          pdMS_TO_TICKS(RATE)
 
 /*=====[Definitions of extern global functions]==============================*/
 
 // Prototipo de funcion de la tarea
 void task_led( void* taskParmPtr );
-void keys_service_task( void* taskParmPtr );
+
 
 /*=====[Definitions of public global variables]==============================*/
 
@@ -37,7 +36,7 @@ int main( void )
     // ---------- CONFIGURACIONES ------------------------------
     boardConfig();  // Inicializar y configurar la plataforma
 
-    printf( "Ejercicio D1\n" );
+    printf( "Ejercicio F1\n" );
 
     // Crear tareas en freeRTOS
     res = xTaskCreate (
@@ -67,25 +66,26 @@ void task_led( void* taskParmPtr )
 {
     uint32_t index = ( uint32_t ) taskParmPtr;
 
+    TickType_t dif =   pdMS_TO_TICKS( 500 );
+
+    TickType_t xPeriodicity = pdMS_TO_TICKS( 1000 ); // Tarea periodica cada 1000 ms
+
     TickType_t xLastWakeTime = xTaskGetTickCount();
 
     while( 1 )
     {
-        TickType_t dif = keys_get_diff( index );
-
-        if( dif != KEYS_INVALID_TIME && dif > 0 )
+        /* consulto de manera no bloqueante si se pulso una tecla */
+        if( key_pressed( TEC1_INDEX ) )
         {
-            if ( dif > LED_RATE_TICKS )
-            {
-                dif = LED_RATE_TICKS;
-            }
-            gpioWrite( LEDB, ON );
-            vTaskDelay( dif );
-            gpioWrite( LEDB, OFF );
+            dif = keys_get_diff( TEC1_INDEX );
         }
 
+        gpioWrite( LEDB, ON );
+        vTaskDelay( dif );
+        gpioWrite( LEDB, OFF );
+
         // Envia la tarea al estado bloqueado durante xPeriodicity (delay periodico)
-        vTaskDelayUntil( &xLastWakeTime, LED_RATE_TICKS );
+        vTaskDelayUntil( &xLastWakeTime, 2*dif );
     }
 }
 
