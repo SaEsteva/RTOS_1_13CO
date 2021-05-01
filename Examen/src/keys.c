@@ -118,54 +118,6 @@ void keys_init( void )
     configASSERT( res == pdPASS );
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /**
    @brief Keys SM for isr operation
 

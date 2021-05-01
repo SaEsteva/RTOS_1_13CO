@@ -86,7 +86,7 @@ void keys_init( void )
 {
     BaseType_t res;
 
-    isr_queue = xQueueCreate( 10, sizeof( t_key_isr_signal ) ) ;
+    isr_queue = xQueueCreate( ISR_QUEUE_SIZE, sizeof( t_key_isr_signal ) ) ;
 
     configASSERT( isr_queue != NULL );
 

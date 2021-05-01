@@ -24,6 +24,7 @@
 #define TEC3_INDEX  2
 #define TEC4_INDEX  3
 
+#define ISR_QUEUE_SIZE  10
 
 /* types ================================================================= */
 typedef enum

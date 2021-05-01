@@ -11,21 +11,16 @@
 #define KEYS_H_
 
 #include "FreeRTOS.h"
-#include "semphr.h"
-#include "queue.h"
+#include "task.h"
+#include "sapi.h"
+#include "mqueue.h"
+
 
 /* public macros ================================================================= */
 #define KEYS_INVALID_TIME   -1
-
-
-
-#define TEC1_INDEX  0
-#define TEC2_INDEX  1
-#define TEC3_INDEX  2
-#define TEC4_INDEX  3
-
-
 /* types ================================================================= */
+
+
 typedef enum
 {
     STATE_BUTTON_UP,
@@ -42,26 +37,15 @@ typedef struct
 typedef struct
 {
     keys_ButtonState_t state;   //variables
+
     TickType_t time_down;		//timestamp of the last High to Low transition of the key
     TickType_t time_up;		    //timestamp of the last Low to High transition of the key
     TickType_t time_diff;	    //variables
-
-
-//    SemaphoreHandle_t pressed_signal;
-
 } t_key_data;
 
-typedef struct
-{
-    gpioMap_t   tecla;
-    TickType_t	event_time;
-    uint32_t    event_type;
-} t_key_isr_signal;
-
 /* methods ================================================================= */
-void keys_init( void );
-TickType_t keys_get_diff( uint32_t index );
-void keys_clear_diff();
-
+void keys_Init( void );
+TickType_t get_diff( uint32_t index );
+void clear_diff( uint32_t index );
 
 #endif /* PDM_ANTIRREBOTE_MEF_INC_DEBOUNCE_H_ */

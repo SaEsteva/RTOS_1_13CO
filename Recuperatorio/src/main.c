@@ -1,11 +1,3 @@
-/*=============================================================================
- * Copyright (c) 2021, Franco Bucafusco <franco_bucafusco@yahoo.com.ar>
- * 					   Martin N. Menendez <mmenendez@fi.uba.ar>
- * All rights reserved.
- * License: Free
- * Date: 2021/10/03
- * Version: v1.2
- *===========================================================================*/
 
 /*=====[Inclusions of function dependencies]=================================*/
 #include "FreeRTOS.h"
@@ -45,7 +37,7 @@ int main( void )
     // ---------- CONFIGURACIONES ------------------------------
     boardConfig();  // Inicializar y configurar la plataforma
 
-    printf( "Ejercicio F3\n" );
+    printf( "Recuperatorio Esteva Santiago\n" );
 
     for( int i = 0; i < LED_COUNT; i++ )
     {
@@ -131,8 +123,43 @@ void task_led( void* taskParmPtr )
         gpioWrite( led_data->led, ON );
         vTaskDelay( dif );
         gpioWrite( led_data->led, OFF );
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
     }
 }
+
+
+void task_button( void* taskParmPtr )
+{
+    t_tecla_led* led_data = taskParmPtr;
+
+    t_key_isr_signal evnt;
+    int tecla_presionada;
+
+    TickType_t dif =   pdMS_TO_TICKS( 500 );
+
+    TickType_t xPeriodicity = pdMS_TO_TICKS( 1000 ); // Tarea periodica cada 1000 ms
+
+    TickType_t xLastWakeTime = xTaskGetTickCount();
+
+    /* creo cola para que la tarea reciba las pulsaciones de las teclas */
+    led_data->queue = xQueueCreate( 2, sizeof( t_key_isr_signal ) );
+
+    while( 1 )
+    {
+        xQueueReceive( led_data->queue, &evnt, portMAX_DELAY );
+
+        dif = keys_get_diff( evnt.tecla );
+
+
+        gpioWrite( led_data->led, ON );
+        vTaskDelay( dif );
+        gpioWrite( led_data->led, OFF );
+        vTaskDelayUntil( &xLastWakeTime, xPeriodicity );
+    }
+}
+
+
+
 
 /* hook que se ejecuta si al necesitar un objeto dinamico, no hay memoria disponible */
 void vApplicationMallocFailedHook()

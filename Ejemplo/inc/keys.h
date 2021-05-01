@@ -1,9 +1,8 @@
 /*=============================================================================
- * Copyright (c) 2021, Franco Bucafusco <franco_bucafusco@yahoo.com.ar>
- * 					   Martin N. Menendez <mmenendez@fi.uba.ar>
+ * Copyright (c) 2021, Santiago Esteva <sesteva@fi.uba.ar>
  * All rights reserved.
  * License: Free
- * Date: 2021/10/03
+ * Date: 2021/23/04
  * Version: v1.2
  *===========================================================================*/
 
@@ -12,12 +11,12 @@
 
 #include "FreeRTOS.h"
 #include "semphr.h"
-#include "queue.h"
+#include "sapi.h"
 
 /* public macros ================================================================= */
 #define KEYS_INVALID_TIME   -1
 
-
+#define KEYS_USE_ISR        1
 
 #define TEC1_INDEX  0
 #define TEC2_INDEX  1
@@ -46,22 +45,19 @@ typedef struct
     TickType_t time_up;		    //timestamp of the last Low to High transition of the key
     TickType_t time_diff;	    //variables
 
+#if KEYS_USE_ISR==1
+    SemaphoreHandle_t isr_signal;   //almacenara el handle del semaforo creado para una cierta tecla
+#endif
 
-//    SemaphoreHandle_t pressed_signal;
+    SemaphoreHandle_t release_buton;
+    SemaphoreHandle_t pressed_buton;
 
 } t_key_data;
-
-typedef struct
-{
-    gpioMap_t   tecla;
-    TickType_t	event_time;
-    uint32_t    event_type;
-} t_key_isr_signal;
 
 /* methods ================================================================= */
 void keys_init( void );
 TickType_t keys_get_diff( uint32_t index );
-void keys_clear_diff();
-
+void keys_clear_diff( uint32_t index );
+int key_pressed( uint32_t index );
 
 #endif /* PDM_ANTIRREBOTE_MEF_INC_DEBOUNCE_H_ */
