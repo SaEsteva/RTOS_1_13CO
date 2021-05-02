@@ -23,8 +23,6 @@
 #define TEC_FALL        0
 #define TEC_RISE        1
 
-#define ISR_QUEUE_SIZE     10
-
 /*=====[Prototypes (declarations) of private functions]======================*/
 static void keys_isr_config( void );
 
@@ -35,7 +33,7 @@ void user_keys_event_handler_button_release( t_key_isr_signal* event_data );
 
 /*=====[Definitions of private global variables]=============================*/
 
-const t_key_config  keys_config[] = { [TEC1_INDEX]= {TEC1}, [TEC2_INDEX]= {TEC2}, [TEC3_INDEX]= {TEC3}} ;
+const t_key_config  keys_config[] = { [TEC1_INDEX]= {TEC1}, [TEC2_INDEX]= {TEC2}, [TEC3_INDEX]= {TEC3}, [TEC4_INDEX]= {TEC4} } ;
 
 #define KEY_COUNT   sizeof(keys_config)/sizeof(keys_config[TEC1_INDEX])
 
@@ -79,7 +77,6 @@ void keys_clear_diff( uint32_t index )
     taskEXIT_CRITICAL();
 }
 
-
 /**
    @brief Inicializa el driver
 
@@ -88,7 +85,7 @@ void keys_init( void )
 {
     BaseType_t res;
 
-    isr_queue = xQueueCreate( ISR_QUEUE_SIZE, sizeof( t_key_isr_signal ) ) ;
+    isr_queue = xQueueCreate( 10, sizeof( t_key_isr_signal ) ) ;
 
     configASSERT( isr_queue != NULL );
 
@@ -98,8 +95,6 @@ void keys_init( void )
         keys_data[i].time_down      = KEYS_INVALID_TIME;
         keys_data[i].time_up        = KEYS_INVALID_TIME;
         keys_data[i].time_diff      = KEYS_INVALID_TIME;
-
-        //        configASSERT( keys_data[i].pressed_signal != NULL );
     }
 
     // Crear tareas en freeRTOS
@@ -119,8 +114,6 @@ void keys_init( void )
     // Gestión de errores
     configASSERT( res == pdPASS );
 }
-
-
 
 /**
    @brief Keys SM for isr operation
@@ -271,6 +264,11 @@ void keys_isr_config( void )
     Chip_PININT_EnableIntLow( LPC_GPIO_PIN_INT, PININTCH2 );
     Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH2 );
 
+    // TEC4 FALL + TEC4 RISE
+    Chip_SCU_GPIOIntPinSel( 3, 1, 9 );
+    Chip_PININT_SetPinModeEdge( LPC_GPIO_PIN_INT, PININTCH3 );
+    Chip_PININT_EnableIntLow( LPC_GPIO_PIN_INT, PININTCH3 );
+    Chip_PININT_EnableIntHigh( LPC_GPIO_PIN_INT, PININTCH3 );
 
     //Una vez que se han configurado los eventos para cada canal de interrupcion
     //Se activan las interrupciones para que comiencen a llamar al handler
@@ -280,7 +278,8 @@ void keys_isr_config( void )
     NVIC_EnableIRQ( PIN_INT1_IRQn );
     NVIC_SetPriority( PIN_INT2_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
     NVIC_EnableIRQ( PIN_INT2_IRQn );
-
+    NVIC_SetPriority( PIN_INT3_IRQn, configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY );
+    NVIC_EnableIRQ( PIN_INT3_IRQn );
 }
 
 
@@ -390,6 +389,32 @@ void GPIO2_IRQHandler( void )
     portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
 }
 
+/**
+   @brief Hanlder de ISR usado para detectar flanco ascendente y descendente de la tecla TEC4_INDEX
+ */
+void GPIO3_IRQHandler( void )
+{
+    t_key_isr_signal event_data;
+    BaseType_t xHigherPriorityTaskWoken = pdFALSE; //Comenzamos definiendo la variable
+
+    if ( Chip_PININT_GetFallStates( LPC_GPIO_PIN_INT ) & PININTCH3 )
+    {
+        //Verificamos que la interrupción es la esperada
+        Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH3 ); //Borramos el flag de interrupción
+
+        keys_isr_fall( TEC4_INDEX, &event_data );
+        xQueueSendFromISR( isr_queue, &event_data, &xHigherPriorityTaskWoken );
+    }
+
+    if ( Chip_PININT_GetRiseStates( LPC_GPIO_PIN_INT ) & PININTCH3 )
+    {
+        Chip_PININT_ClearIntStatus( LPC_GPIO_PIN_INT, PININTCH3 );
+        keys_isr_rise( TEC4_INDEX, &event_data );
+        xQueueSendFromISR( isr_queue, &event_data, &xHigherPriorityTaskWoken );
+    }
+
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
 
 
 

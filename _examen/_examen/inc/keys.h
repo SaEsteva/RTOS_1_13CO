@@ -22,6 +22,7 @@
 #define TEC1_INDEX  0
 #define TEC2_INDEX  1
 #define TEC3_INDEX  2
+#define TEC4_INDEX  3
 
 
 /* types ================================================================= */
